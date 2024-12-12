@@ -1,5 +1,5 @@
 {
-  "name": "chatbot-react-native-sdk",
+  "name": "@chatbot/react-native",
   "version": "1.0.0",
   "private": false,
   "description": "Chat Widget SDK for react native application.",
@@ -8,7 +8,8 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "publishChatBot": "npm publish"
   },
   "author": "Parakh Jain",
   "license": "ISC",
@@ -32,7 +33,7 @@
     "React Native"
   ],
   "bugs": {
-    "url": "https://github.com/Walkover-Web-Solution/HelloSDK/issues"
+    "url": "https://github.com/parakhjain23/chatbot-react-native-sdk/issues"
   },
-  "homepage": "https://github.com/Walkover-Web-Solution/HelloSDK#readme"
+  "homepage": "https://github.com/parakhjain23/chatbot-react-native-sdk.git"
 }
