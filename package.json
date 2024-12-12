@@ -1,0 +1,38 @@
+{
+  "name": "chatbot-react-native-sdk",
+  "version": "1.0.0",
+  "private": false,
+  "description": "Chat Widget SDK for react native application.",
+  "main": "index.tsx",
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Parakh Jain",
+  "license": "ISC",
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "react-native-webview": "^11.23.1"
+  },
+  "devDependencies": {
+    "@types/react-native": "*",
+    "@types/react": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/parakhjain23/chatbot-react-native-sdk.git"
+  },
+  "keywords": [
+    "msg91",
+    "helloSDK",
+    "Hello Chat widget In React Native",
+    "React Native"
+  ],
+  "bugs": {
+    "url": "https://github.com/Walkover-Web-Solution/HelloSDK/issues"
+  },
+  "homepage": "https://github.com/Walkover-Web-Solution/HelloSDK#readme"
+}
