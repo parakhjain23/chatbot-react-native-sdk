@@ -1,6 +1,6 @@
 {
   "name": "chatbot-react-native-sdk",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Chat Widget SDK for react native application.",
   "main": "index.tsx",
   "scripts": {
@@ -26,9 +26,10 @@
     "url": "git+https://github.com/parakhjain23/chatbot-react-native-sdk.git"
   },
   "keywords": [
-    "msg91",
-    "helloSDK",
-    "Hello Chat widget In React Native",
+    "Chatbot",
+    "Chatbot SDK",
+    "AI Middleware",
+    "Chatbot widget In React Native",
     "React Native"
   ],
   "bugs": {
