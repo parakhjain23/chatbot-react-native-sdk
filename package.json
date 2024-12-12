@@ -15,7 +15,7 @@
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
-    "react-native-webview": "^11.23.1"
+    "react-native-webview": ">=11.23.1"
   },
   "devDependencies": {
     "@types/react-native": "*",
