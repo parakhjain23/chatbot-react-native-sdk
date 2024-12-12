@@ -8,11 +8,15 @@ interface ChatbotProps {
   embedToken: string;
   bridgeName: string;
   threadId: string;
+  openInContainer?: boolean;
+  hideIcon?: boolean;
+  defaultOpen?: boolean;
+  hideCloseButton?: boolean;
 }
 
-const ChatBot: React.FC<ChatbotProps> = ({ props }) => {
+const ChatBot: React.FC<ChatbotProps> = (props) => {
   const [isWebViewVisible, setIsWebViewVisible] = useState(false);
-  const { embedToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdfaWQiOiIxMjg5IiwiY2hhdGJvdF9pZCI6IjY2NTk2YWU3ZjA0NGRlNzMzZTNlYzdlYiIsInVzZXJfaWQiOiIxMjM0In0.WPAYYTuTFoXaLJLrA_SR14eym4lxjtiJpamyk2GBOTE", bridgeName = "demo", threadId = "12345" } = props || {};
+  const { embedToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdfaWQiOiIxMjg5IiwiY2hhdGJvdF9pZCI6IjY2NTk2YWU3ZjA0NGRlNzMzZTNlYzdlYiIsInVzZXJfaWQiOiIxMjM0In0.WPAYYTuTFoXaLJLrA_SR14eym4lxjtiJpamyk2GBOTE", bridgeName = "demo", threadId = "12345", openInContainer = false, hideIcon = false, defaultOpen = false, hideCloseButton = false } = props || {};
 
   const webViewRef = useRef(null);
 
@@ -49,6 +53,15 @@ const ChatBot: React.FC<ChatbotProps> = ({ props }) => {
             }
           `;
           break;
+        case "hideCloseButton":
+          script = `
+            if (window.SendDataToChatbot) {
+              window.SendDataToChatbot(${JSON.stringify({ hideCloseButton: true })});
+            } else {
+              console.log("window.openChatbot is not available");
+            }
+          `;
+          break;
         default:
           console.log("Unknown type");
       }
@@ -58,11 +71,12 @@ const ChatBot: React.FC<ChatbotProps> = ({ props }) => {
 
   useEffect(() => {
     handleDataSending("sendData");
-  }, [chatbotProps])
+  }, [chatbotProps]);
 
   // Handle message from WebView
   const handleOnMessage = (event: any) => {
     const data = JSON.parse(event.nativeEvent.data);
+    console.log('first', data);
     if (data?.type === "close") {
       setIsWebViewVisible(false);
     }
@@ -100,13 +114,13 @@ const ChatBot: React.FC<ChatbotProps> = ({ props }) => {
     </html>
   `;
 
-  // const hasNotch = StatusBar.currentHeight > 24;
-  const hasNotch = false;
+  const hasNotch = StatusBar.currentHeight > 24;
+  // const hasNotch = false;
 
 
   return (
     <>
-      <View style={{
+      {!hideIcon && <TouchableOpacity onPress={() => setIsWebViewVisible(true)} style={{
         position: 'absolute',
         bottom: 20,
         right: 20,
@@ -117,28 +131,28 @@ const ChatBot: React.FC<ChatbotProps> = ({ props }) => {
         justifyContent: 'center',
         alignItems: 'center',
         cursor: 'pointer',
-      }}
-      > 
-      <TouchableOpacity onPress={() => setIsWebViewVisible(true)} >
-          <Image
-            source={require("./assets/whiteIcon.png")}
-            style={{ width: 30, height: 30 }}
-            resizeMode='contain'
-          />
-        </TouchableOpacity>
-      </View>
+      }} >
+        <Image
+          source={require("./assets/whiteIcon.png")}
+          style={{ width: 30, height: 30 }}
+          resizeMode='contain'
+        />
+      </TouchableOpacity>
+      }
       <View
         style={{
           position: 'absolute',
-          width: isWebViewVisible ? width : 0,
-          height: isWebViewVisible ? height : 0,
+          bottom: 0,
+          left: 0,
+          width: isWebViewVisible ? openInContainer ? '100%' : width : 0,
+          height: isWebViewVisible ? openInContainer ? '100%' : height : 0,
           backgroundColor: 'red'
         }}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           style={{
-            width: isWebViewVisible ? width : 0,
-            height: isWebViewVisible ? Platform.OS === 'android' ? '100%' : hasNotch ? height - StatusBar.currentHeight : height - StatusBar.currentHeight * 3 : 0,
+            width: isWebViewVisible ? openInContainer ? '100%' : width : 0,
+            height: isWebViewVisible ? openInContainer ? '100%' : (Platform.OS === 'android' ? '100%' : (hasNotch ? height - StatusBar.currentHeight : height - StatusBar.currentHeight * 3)) : 0,
           }}
         >
           <View style={{ flex: 1, marginTop: Platform.OS === 'ios' ? 0 : 0 }} >
@@ -150,7 +164,8 @@ const ChatBot: React.FC<ChatbotProps> = ({ props }) => {
               ]}
               containerStyle={{ flex: 1 }}
               scalesPageToFit={true}
-              cacheMode='LOAD_CACHE_ELSE_NETWORK'
+              // cacheMode='LOAD_CACHE_ELSE_NETWORK'
+              cacheEnabled={false}
               contentMode="mobile"
               javaScriptEnabled
               collapsable={true}
@@ -158,6 +173,13 @@ const ChatBot: React.FC<ChatbotProps> = ({ props }) => {
               onLoadEnd={() => {
                 // You can call the method to open the chatbot once it is loaded
                 handleDataSending("sendData");
+                if (defaultOpen) {
+                  handleDataSending("openChatbot");
+                  setIsWebViewVisible(true);
+                }
+                if (hideCloseButton) {
+                  handleDataSending("hideCloseButton");
+                }
               }}
               onMessage={handleOnMessage}  // Listen to messages from WebView
             />

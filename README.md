@@ -1,50 +1,66 @@
-# Welcome to your Expo app 👋
+````markdown
+# ChatBot Integration in React Native
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native component for integrating a customizable chatbot into your mobile applications. The chatbot provides a seamless way for users to interact with automated systems directly within their mobile apps.
 
-## Get started
+## Features
+- Embeds a chatbot within a `WebView`.
+- Customizable appearance and behavior.
+- Supports message passing between mobile app and the chatbot.
 
-1. Install dependencies
+## Installation
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-    npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+Ensure you have `react-native-webview` installed in your project:
 
 ```bash
-npm run reset-project
+npm install react-native-webview
+````
+
+## Usage
+
+To use the `ChatBot` component, import it and include it in your component tree. Below is an example with basic configuration:
+
+```javascript
+import React from 'react';
+import { View } from 'react-native';
+import ChatBot from './path-to-your-chatbot-component/ChatBot'; // Adjust path accordingly
+
+const App = () => {
+  return (
+    <View style={{ flex: 1 }}>
+      <ChatBot
+        embedToken="your-embed-token-here"
+        bridgeName="your-bridge-name"
+        threadId="unique-thread-id"
+        openInContainer={false}
+        hideIcon={false}
+        defaultOpen={false}
+        hideCloseButton={false}
+      />
+    </View>
+  );
+};
+
+export default App;
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Props
 
-## Learn more
+| Prop Name | Type | Required | Default | Description | |-----------------|---------|----------|---------|-----------------------------------------------------------------------------------------------| | `embedToken` | String | Yes | N/A | Token used to authenticate and configure the chatbot. | | `bridgeName` | String | Yes | N/A | A unique name identifying the chatbot bridge. | | `threadId` | String | Yes | N/A | An identifier for the conversation thread. | | `openInContainer` | Boolean | No | `false` | Opens the chatbot within a specific app container. | | `hideIcon` | Boolean | No | `false` | Option to hide the default chatbot launch icon. | | `defaultOpen` | Boolean | No | `false` | Opens the chatbot interface by default when the component mounts. | | `hideCloseButton` | Boolean | No | `false` | Hides the close button when true, keeping the chatbot always active. |
 
-To learn more about developing your project with Expo, look at the following resources:
+## How it Works
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+-   The component leverages `WebView` to render the chatbot interface.
+-   JavaScript is injected into the WebView to handle actions like opening the chatbot (`openChatbot`) or sending data (`SendDataToChatbot`).
+-   The component can customize its behavior based on prop changes through the lifecycle of the component.
 
-## Join the community
+## Development
 
-Join our community of developers creating universal apps.
+### Handling JavaScript Injection
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+To manage specific interactions between the app and chatbot, scripts are dynamically added to control behavior. Ensure these scripts and your conditions are met for the integration to work smoothly. Check your console output for any missing functions that need to be defined within your chatbot's web environment.
+
+
+## Note
+
+Make sure your web environment within the WebView loads all necessary scripts, and alterations or extensions to your local hosting setup may be necessary to properly render and execute your chatbot scripts.
