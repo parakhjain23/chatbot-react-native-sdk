@@ -16,7 +16,7 @@ interface ChatbotProps {
 
 const ChatBot: React.FC<ChatbotProps> = (props) => {
   const [isWebViewVisible, setIsWebViewVisible] = useState(false);
-  const { embedToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdfaWQiOiIxMjg5IiwiY2hhdGJvdF9pZCI6IjY2NTk2YWU3ZjA0NGRlNzMzZTNlYzdlYiIsInVzZXJfaWQiOiIxMjM0In0.WPAYYTuTFoXaLJLrA_SR14eym4lxjtiJpamyk2GBOTE", bridgeName = "demo", threadId = "12345", openInContainer = false, hideIcon = false, defaultOpen = false, hideCloseButton = false } = props || {};
+  const { embedToken, bridgeName, threadId = "", openInContainer = false, hideIcon = false, defaultOpen = false, hideCloseButton = false } = props || {};
 
   const webViewRef = useRef(null);
 
