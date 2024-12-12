@@ -10,7 +10,7 @@ interface ChatbotProps {
     threadId: string;
 }
 
-const Chatbot: React.FC<ChatbotProps> = ({ props, isWebViewVisible, setIsWebViewVisible }) => {
+const Chat: React.FC<ChatbotProps> = ({ props, isWebViewVisible, setIsWebViewVisible }) => {
     //   const [isWebViewVisible, setIsWebViewVisible] = useState(false);
     const { embedToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdfaWQiOiIxMjg5IiwiY2hhdGJvdF9pZCI6IjY2NTk2YWU3ZjA0NGRlNzMzZTNlYzdlYiIsInVzZXJfaWQiOiIxMjM0In0.WPAYYTuTFoXaLJLrA_SR14eym4lxjtiJpamyk2GBOTE", bridgeName = "demo", threadId = "12345" } = props || {};
 
@@ -150,4 +150,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Chatbot;
+export default Chat;
