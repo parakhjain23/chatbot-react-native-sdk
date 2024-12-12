@@ -145,8 +145,7 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
           bottom: 0,
           left: 0,
           width: isWebViewVisible ? openInContainer ? '100%' : width : 0,
-          height: isWebViewVisible ? openInContainer ? '100%' : height : 0,
-          backgroundColor: 'red'
+          height: isWebViewVisible ? openInContainer ? '100%' : height : 0
         }}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
