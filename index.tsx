@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Dimensions, Image, KeyboardAvoidingView, Platform, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, Dimensions, Image, KeyboardAvoidingView, Platform, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 const { height, width } = Dimensions.get('screen');
@@ -29,6 +29,23 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
       threadId: threadId || prevProps.threadId
     }));
   }, [props]);
+
+  const handleEvent = (event: any) => {
+    if (event?.type === 'openChatbot') {
+      setIsWebViewVisible(true);
+    } else if (event?.type === 'closeChatbot') {
+      setIsWebViewVisible(false);
+    }
+  }
+
+  useEffect(()=>{
+    DeviceEventEmitter.addListener('openChatbot', handleEvent);
+    DeviceEventEmitter.addListener('closeChatbot', handleEvent);
+    return () => {
+      DeviceEventEmitter.removeAllListeners('openChatbot');
+      DeviceEventEmitter.removeAllListeners('closeChatbot');
+    }
+  },[])
 
   const handleDataSending = (type: string) => {
     // Ensure WebView is loaded before injecting JS
@@ -76,7 +93,6 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
   // Handle message from WebView
   const handleOnMessage = (event: any) => {
     const data = JSON.parse(event.nativeEvent.data);
-    console.log('first', data);
     if (data?.type === "close") {
       setIsWebViewVisible(false);
     }
