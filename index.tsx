@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { DeviceEventEmitter, Dimensions, Image, KeyboardAvoidingView, Platform, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, BackHandler, Dimensions, Image, KeyboardAvoidingView, Platform, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 const { height, width } = Dimensions.get('screen');
@@ -39,6 +39,7 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
   }
 
   useEffect(()=>{
+    BackHandler.addEventListener("hardwareBackPress", handleCloseChatbot);
     DeviceEventEmitter.addListener('openChatbot', handleEvent);
     DeviceEventEmitter.addListener('closeChatbot', handleEvent);
     return () => {
@@ -67,6 +68,15 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
               window.openChatbot();
             } else {
               console.log("window.openChatbot is not available");
+            }
+          `;
+          break;
+        case "closeChatbot":
+          script = `
+            if (window.closeChatbot) {
+              window.closeChatbot();
+            } else {
+              console.log("window.closeChatbot is not available");
             }
           `;
           break;
@@ -101,6 +111,10 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
   const handleOpenChatbot = () => {
     handleDataSending("openChatbot");
   }
+  const handleCloseChatbot = (_: any) => {
+    setIsWebViewVisible(false);
+    handleDataSending("closeChatbot");
+  }
 
   useEffect(() => {
     if (isWebViewVisible) {
@@ -131,6 +145,7 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
   `;
 
   const hasNotch = StatusBar.currentHeight > 24;
+  const iosKeyboardAvoidingHeight = hasNotch ? height - StatusBar.currentHeight : height - StatusBar.currentHeight * 3;
   // const hasNotch = false;
 
 
@@ -161,16 +176,19 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
           bottom: 0,
           left: 0,
           width: isWebViewVisible ? openInContainer ? '100%' : width : 0,
-          height: isWebViewVisible ? openInContainer ? '100%' : height : 0
+          height: isWebViewVisible ? openInContainer ? '100%' : '100%' : 0
         }}>
+          <StatusBar
+          translucent={isWebViewVisible ? false : null}
+          backgroundColor={null} />
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          behavior={Platform.OS === 'ios' ? 'padding' : null}
           style={{
             width: isWebViewVisible ? openInContainer ? '100%' : width : 0,
-            height: isWebViewVisible ? openInContainer ? '100%' : (Platform.OS === 'android' ? '100%' : (hasNotch ? height - StatusBar.currentHeight : height - StatusBar.currentHeight * 3)) : 0,
+            height: isWebViewVisible ?( openInContainer ? '100%' : (Platform.OS === 'android' ? '100%' : iosKeyboardAvoidingHeight)) : 0,
           }}
         >
-          <View style={{ flex: 1, marginTop: Platform.OS === 'ios' ? 0 : 0 }} >
+          <View style={{ flex: 1, marginTop: Platform.OS === 'ios' ? 30 : 10 }} >
             <WebView
               ref={webViewRef}  // Reference the WebView
               source={{ html: htmlContent }}  // Pass the HTML content
@@ -178,13 +196,12 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
                 styles.webview
               ]}
               containerStyle={{ flex: 1 }}
-              scalesPageToFit={true}
+              scalesPageToFit={false}
+              scrollEnabled={false}
               // cacheMode='LOAD_CACHE_ELSE_NETWORK'
               cacheEnabled={false}
               contentMode="mobile"
               javaScriptEnabled
-              collapsable={true}
-              scrollEnabled={false}
               onLoadEnd={() => {
                 // You can call the method to open the chatbot once it is loaded
                 handleDataSending("sendData");
