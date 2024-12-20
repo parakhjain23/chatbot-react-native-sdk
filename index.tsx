@@ -36,17 +36,25 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
     } else if (event?.type === 'closeChatbot') {
       setIsWebViewVisible(false);
     }
+    else if (event?.type === 'SendDataToChatbot') {
+      const data = event.data;
+      setChatbotProps((prevProps: any) => ({
+        ...prevProps,
+        ...data
+      }));
+    }
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     BackHandler.addEventListener("hardwareBackPress", handleCloseChatbot);
     DeviceEventEmitter.addListener('openChatbot', handleEvent);
     DeviceEventEmitter.addListener('closeChatbot', handleEvent);
+    DeviceEventEmitter.addListener('SendDataToChatbot', handleEvent);
     return () => {
       DeviceEventEmitter.removeAllListeners('openChatbot');
       DeviceEventEmitter.removeAllListeners('closeChatbot');
     }
-  },[])
+  }, [])
 
   const handleDataSending = (type: string) => {
     // Ensure WebView is loaded before injecting JS
@@ -103,6 +111,7 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
   // Handle message from WebView
   const handleOnMessage = (event: any) => {
     const data = JSON.parse(event.nativeEvent.data);
+    console.log(data, 'event from webview');
     if (data?.type === "close") {
       setIsWebViewVisible(false);
     }
@@ -123,7 +132,7 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
   }, [isWebViewVisible])
 
   // Create the HTML string with the chatbot script
-  const htmlContent = `
+  const generateHtmlContent = (embedToken: string, bridgeName: string, threadId: string) => `
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -144,10 +153,23 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
     </html>
   `;
 
+  const [htmlContent, setHtmlContent] = useState(generateHtmlContent(embedToken, bridgeName, threadId));
+
+  useEffect(() => {
+    if (embedToken) {
+      setHtmlContent(generateHtmlContent(embedToken, bridgeName, threadId));
+    }
+  }, [embedToken]);
+
   const hasNotch = StatusBar.currentHeight > 24;
   const iosKeyboardAvoidingHeight = hasNotch ? height - StatusBar.currentHeight : height - StatusBar.currentHeight * 3;
   // const hasNotch = false;
 
+  if (!embedToken) {
+    return (
+      null
+    )
+  }
 
   return (
     <>
@@ -178,17 +200,17 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
           width: isWebViewVisible ? openInContainer ? '100%' : width : 0,
           height: isWebViewVisible ? openInContainer ? '100%' : '100%' : 0
         }}>
-          <StatusBar
+        <StatusBar
           translucent={isWebViewVisible ? false : null}
           backgroundColor={null} />
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : null}
           style={{
             width: isWebViewVisible ? openInContainer ? '100%' : width : 0,
-            height: isWebViewVisible ?( openInContainer ? '100%' : (Platform.OS === 'android' ? '100%' : iosKeyboardAvoidingHeight)) : 0,
+            height: isWebViewVisible ? (openInContainer ? '100%' : (Platform.OS === 'android' ? '100%' : iosKeyboardAvoidingHeight)) : 0,
           }}
         >
-          <View style={{ flex: 1, marginTop: Platform.OS === 'ios' ? 30 : 10 }} >
+          <View style={{ flex: 1, marginTop: Platform.OS === 'ios' ? 30 : 0 }} >
             <WebView
               ref={webViewRef}  // Reference the WebView
               source={{ html: htmlContent }}  // Pass the HTML content
@@ -200,8 +222,10 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
               scrollEnabled={false}
               // cacheMode='LOAD_CACHE_ELSE_NETWORK'
               cacheEnabled={false}
-              contentMode="mobile"
-              javaScriptEnabled
+              allowingReadAccessToURL="*"
+              sharedCookiesEnabled={true}
+              javaScriptEnabled={true}
+              domStorageEnabled={true}
               onLoadEnd={() => {
                 // You can call the method to open the chatbot once it is loaded
                 handleDataSending("sendData");
@@ -214,6 +238,8 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
                 }
               }}
               onMessage={handleOnMessage}  // Listen to messages from WebView
+              onError={(error) => console.log('error', error)}
+              onHttpError={(error) => console.log('http error', error)}
             />
           </View>
         </KeyboardAvoidingView>
