@@ -5,18 +5,19 @@ import { WebView } from 'react-native-webview';
 const { height, width } = Dimensions.get('screen');
 
 interface ChatbotProps {
-  embedToken: string;
-  bridgeName: string;
-  threadId: string;
+  embedToken: string | null;
+  bridgeName: string | null;
+  threadId: string | null;
   openInContainer?: boolean;
   hideIcon?: boolean;
   defaultOpen?: boolean;
   hideCloseButton?: boolean;
+  variables?: any;
 }
 
 const ChatBot: React.FC<ChatbotProps> = (props) => {
   const [isWebViewVisible, setIsWebViewVisible] = useState(false);
-  const { embedToken, bridgeName, threadId = "", openInContainer = false, hideIcon = false, defaultOpen = false, hideCloseButton = false } = props || {};
+  const { embedToken, bridgeName, threadId = "", openInContainer = false, hideIcon = false, defaultOpen = false, hideCloseButton = false, variables = {} } = props || {};
 
   const webViewRef = useRef(null);
 
@@ -26,7 +27,8 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
   useEffect(() => {
     setChatbotProps((prevProps: any) => ({
       bridgeName: bridgeName || prevProps.bridgeName,
-      threadId: threadId || prevProps.threadId
+      threadId: threadId || prevProps.threadId,
+      variables: { ...prevProps.variables, ...(variables || {}) }
     }));
   }, [props]);
 
@@ -180,6 +182,7 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
         width: 50,
         height: 50,
         borderRadius: 30,
+        zIndex: 99999,
         backgroundColor: 'black',
         justifyContent: 'center',
         alignItems: 'center',
@@ -198,7 +201,8 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
           bottom: 0,
           left: 0,
           width: isWebViewVisible ? openInContainer ? '100%' : width : 0,
-          height: isWebViewVisible ? openInContainer ? '100%' : '100%' : 0
+          height: isWebViewVisible ? openInContainer ? '100%' : '100%' : 0,
+          zIndex: 999999 // Ensure the z-index is the highest
         }}>
         <StatusBar
           translucent={isWebViewVisible ? false : null}
