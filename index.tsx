@@ -48,13 +48,19 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
   }
 
   useEffect(() => {
+    const backHandlerListener = BackHandler.addEventListener(
+      "hardwareBackPress",
+      handleCloseChatbot
+    );
     BackHandler.addEventListener("hardwareBackPress", handleCloseChatbot);
     DeviceEventEmitter.addListener('openChatbot', handleEvent);
     DeviceEventEmitter.addListener('closeChatbot', handleEvent);
     DeviceEventEmitter.addListener('SendDataToChatbot', handleEvent);
     return () => {
+      backHandlerListener.remove();
       DeviceEventEmitter.removeAllListeners('openChatbot');
       DeviceEventEmitter.removeAllListeners('closeChatbot');
+      DeviceEventEmitter.removeAllListeners("SendDataToChatbot");
     }
   }, [])
 
@@ -123,8 +129,13 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
     handleDataSending("openChatbot");
   }
   const handleCloseChatbot = (_: any) => {
-    setIsWebViewVisible(false);
-    handleDataSending("closeChatbot");
+    if (isWebViewVisible) {
+      // Close the chatbot and indicate back press is handled
+      setIsWebViewVisible(false);
+      handleDataSending("closeChatbot");
+      return true; // Prevent default back button action
+    }
+    return false; // Allow default back button action
   }
 
   useEffect(() => {
@@ -139,7 +150,7 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
     <html lang="en">
     <head>
       <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
       <title>Chatbot</title>
     </head>
     <body>
