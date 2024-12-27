@@ -212,7 +212,7 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
           bottom: 0,
           left: 0,
           width: isWebViewVisible ? openInContainer ? '100%' : width : 0,
-          height: isWebViewVisible ? openInContainer ? '100%' : '100%' : 0,
+          height: isWebViewVisible ? openInContainer ? '100%' : ( Platform.OS === 'ios' ? height : '100%' ): 0,
           zIndex: 999999 // Ensure the z-index is the highest
         }}>
         <StatusBar
