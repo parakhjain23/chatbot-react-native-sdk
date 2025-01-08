@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { DeviceEventEmitter, BackHandler, Dimensions, Image, KeyboardAvoidingView, Platform, StatusBar, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { DeviceEventEmitter, BackHandler, Dimensions, Image, KeyboardAvoidingView, Platform, StatusBar, StyleSheet, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 const { height, width } = Dimensions.get('screen');
@@ -48,21 +48,35 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
   }
 
   useEffect(() => {
-    const backHandlerListener = BackHandler.addEventListener(
-      "hardwareBackPress",
-      handleCloseChatbot
-    );
-    BackHandler.addEventListener("hardwareBackPress", handleCloseChatbot);
     DeviceEventEmitter.addListener('openChatbot', handleEvent);
     DeviceEventEmitter.addListener('closeChatbot', handleEvent);
     DeviceEventEmitter.addListener('SendDataToChatbot', handleEvent);
     return () => {
-      backHandlerListener.remove();
       DeviceEventEmitter.removeAllListeners('openChatbot');
       DeviceEventEmitter.removeAllListeners('closeChatbot');
       DeviceEventEmitter.removeAllListeners("SendDataToChatbot");
     }
-  }, [])
+  }, []);
+
+  const handleCloseChatbot = (isWebViewVisibleHai: any) => {
+    if (isWebViewVisibleHai) {
+      // Close the chatbot and indicate back press is handled
+      setIsWebViewVisible(false);
+      handleDataSending("closeChatbot");
+      return true; // Prevent default back button action
+    }
+    return false; // Allow default back button action
+  }
+
+  useEffect(() => {
+    const backHandlerListener = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => handleCloseChatbot(isWebViewVisible)
+    );
+    return () => {
+      backHandlerListener.remove();
+    }
+  }, [isWebViewVisible])
 
   const handleDataSending = (type: string) => {
     // Ensure WebView is loaded before injecting JS
@@ -119,7 +133,6 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
   // Handle message from WebView
   const handleOnMessage = (event: any) => {
     const data = JSON.parse(event.nativeEvent.data);
-    console.log(data, 'event from webview');
     if (data?.type === "close") {
       setIsWebViewVisible(false);
     }
@@ -127,15 +140,6 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
 
   const handleOpenChatbot = () => {
     handleDataSending("openChatbot");
-  }
-  const handleCloseChatbot = (_: any) => {
-    if (isWebViewVisible) {
-      // Close the chatbot and indicate back press is handled
-      setIsWebViewVisible(false);
-      handleDataSending("closeChatbot");
-      return true; // Prevent default back button action
-    }
-    return false; // Allow default back button action
   }
 
   useEffect(() => {
@@ -241,6 +245,7 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
               sharedCookiesEnabled={true}
               javaScriptEnabled={true}
               domStorageEnabled={true}
+              renderLoading={() => <ActivityIndicator size="large" color="#0000ff" />}
               onLoadEnd={() => {
                 // You can call the method to open the chatbot once it is loaded
                 handleDataSending("sendData");
@@ -255,6 +260,8 @@ const ChatBot: React.FC<ChatbotProps> = (props) => {
               onMessage={handleOnMessage}  // Listen to messages from WebView
               onError={(error) => console.log('error', error)}
               onHttpError={(error) => console.log('http error', error)}
+              pullToRefreshEnabled={true}
+              refreshControlLightMode={true}
             />
           </View>
         </KeyboardAvoidingView>

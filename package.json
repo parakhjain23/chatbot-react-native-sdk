@@ -1,6 +1,6 @@
 {
   "name": "chatbot-react-native-sdk",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "Chat Widget SDK for react native application.",
   "main": "index.tsx",
   "scripts": {
